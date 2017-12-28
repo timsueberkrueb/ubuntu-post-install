@@ -1,0 +1,4 @@
+[submodule "ubup"]
+	path = ubup
+	url = https://github.com/tim-sueberkrueb/ubup.git
+	branch = develop
