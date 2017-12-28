@@ -2,47 +2,45 @@ author: Tim Süberkrüb
 description: |
   My personal Ubuntu setup powered by ubup.
   Tested on Ubuntu 17.10
-steps:
-  # Essential command line tools
-  - apt-packages:
+setup:
+  cmd-tools:
+    $apt-packages:
       - jq
       - curl
       - fish
-  # Powerline fonts
-  - scriptlets:
-      powerline-fonts: |
-        mkdir -p /tmp/powerline-downloads && cd /tmp/powerline-downloads
-        sudo apt install fonts-powerline
-        wget https://github.com/powerline/powerline/raw/develop/font/PowerlineSymbols.otf
-        wget https://github.com/powerline/powerline/raw/develop/font/10-powerline-symbols.conf
-        if [ ! -d ~/.fonts ]; then mkdir ~/.fonts; fi
-        if [ ! -d ~/.config/fontconfig/conf.d/ ]; then mkdir -p ~/.config/fontconfig/conf.d; fi
-        mv PowerlineSymbols.otf ~/.fonts/
-        mv 10-powerline-symbols.conf ~/.config/fontconfig/conf.d/
-        fc-cache -vf ~/.fonts/
-        rm -r /tmp/powerline-downloads
-  # Chips
-  - scriptlets:
-      chips: |
-        URL=$( curl -s "https://api.github.com/repos/xtendo-org/chips/releases/latest" \
-         | jq -r '.assets[] | select(.name=="chips_gnulinux" )
-         | .browser_download_url' )
-        curl -Lo ~/.local/bin/chips --create-dirs "$URL";
-        chmod +x ~/.local/bin/chips
-  # Shellder fish theme
-  - scriptlets:
-      shellder: |
-        mkdir -p ~/.config/chips
-        touch ~/.config/chips/plugin.yaml
-        echo "github:" >> ~/.config/chips/plugin.yaml
-        echo "  - simnalamburt/shellder" >> ~/.config/chips/plugin.yaml
-        echo "" >> ~/.config/chips/plugin.yaml
-        exec ~/.local/bin/chips
-  # Change default shell to fish
-  - scriptlets:
-      chsh: sudo chsh $USER -s $(which fish)
-  # Essential dev packages
-  - apt-packages:
+  powerline-fonts:
+    $scriptlet: |
+      mkdir -p /tmp/powerline-downloads && cd /tmp/powerline-downloads
+      sudo apt install fonts-powerline
+      wget https://github.com/powerline/powerline/raw/develop/font/PowerlineSymbols.otf
+      wget https://github.com/powerline/powerline/raw/develop/font/10-powerline-symbols.conf
+      if [ ! -d ~/.fonts ]; then mkdir ~/.fonts; fi
+      if [ ! -d ~/.config/fontconfig/conf.d/ ]; then mkdir -p ~/.config/fontconfig/conf.d; fi
+      mv PowerlineSymbols.otf ~/.fonts/
+      mv 10-powerline-symbols.conf ~/.config/fontconfig/conf.d/
+      fc-cache -vf ~/.fonts/
+      rm -r /tmp/powerline-downloads
+  chips:
+    $scriptlet: |
+      URL=$( curl -s "https://api.github.com/repos/xtendo-org/chips/releases/latest" \
+       | jq -r '.assets[] | select(.name=="chips_gnulinux" )
+       | .browser_download_url' )
+      curl -Lo ~/.local/bin/chips --create-dirs "$URL";
+      chmod +x ~/.local/bin/chips
+  shellder:
+    $scriptlet: |
+      mkdir -p ~/.config/chips
+      touch ~/.config/chips/plugin.yaml
+      echo "github:" >> ~/.config/chips/plugin.yaml
+      echo "  - simnalamburt/shellder" >> ~/.config/chips/plugin.yaml
+      echo "" >> ~/.config/chips/plugin.yaml
+      exec ~/.local/bin/chips
+  chsh:
+    $scriptlet: |
+      # Change default shell to fish
+      sudo chsh $USER -s $(which fish)
+  dev-packages:
+    $apt-packages:
       - build-essential
       - git
       - mesa-common-dev
@@ -52,12 +50,35 @@ steps:
       - autoconf
       - python3-dev
       - python-dev
-  # Directory structure
-  - folders:
+  home-folders:
+    $folders:
       - ~/Apps
       - ~/Dev
-  # Applications
-  - snap-packages:
+  desktop-apps:
+    etcher:
+      $scriptlet: |
+        mkdir -p ~/Apps/Etcher && cd ~/Apps/Etcher
+        URL=$( curl -s "https://api.github.com/repos/resin-io/etcher/releases/latest" \
+               | jq -r '.assets[] | select((.name | startswith("etcher")) and (.name | endswith("x86_64.AppImage")) )
+               | .browser_download_url' )
+        curl -LO "$URL"
+        chmod +x *.AppImage
+    insomnia:
+      $scriptlet: |
+        mkdir -p ~/Apps/Insomnia && cd ~/Apps/Insomnia
+        curl -LO "https://builds.insomnia.rest/downloads/linux/latest"
+        chmod +x *.AppImage
+    keeweb:
+      $scriptlet: |
+        mkdir -p /tmp/keeweb-download && cd /tmp/keeweb-download
+        URL=$( curl -s "https://api.github.com/repos/keeweb/keeweb/releases/latest" \
+               | jq -r '.assets[] | select((.name | startswith("KeeWeb")) and (.name | endswith("linux.x64.deb")) )
+               | .browser_download_url' )
+        curl -LO "$URL"
+        sudo dpkg -i KeeWeb*.deb
+        sudo apt-get -f install
+        rm -r /tmp/keeweb-download
+    $snap-packages:
       # Network & Communication:
       - chromium
       - telegram-sergiusens
@@ -80,29 +101,5 @@ steps:
           channel: edge
           devmode: true
       - hugo
-    apt-packages:
+    $apt-packages:
       - gnome-tweak-tool
-    scriptlets:
-      # Etcher AppImage
-      etcher: |
-        mkdir -p ~/Apps/Etcher && cd ~/Apps/Etcher
-        URL=$( curl -s "https://api.github.com/repos/resin-io/etcher/releases/latest" \
-               | jq -r '.assets[] | select((.name | startswith("etcher")) and (.name | endswith("x86_64.AppImage")) )
-               | .browser_download_url' )
-        curl -LO "$URL"
-        chmod +x *.AppImage
-      # Insomnia AppImage
-      insomnia: |
-        mkdir -p ~/Apps/Insomnia && cd ~/Apps/Insomnia
-        curl -LO "https://builds.insomnia.rest/downloads/linux/latest"
-        chmod +x *.AppImage
-      # Keeweb .deb
-      keeweb: |
-        mkdir -p /tmp/keeweb-download && cd /tmp/keeweb-download
-        URL=$( curl -s "https://api.github.com/repos/keeweb/keeweb/releases/latest" \
-               | jq -r '.assets[] | select((.name | startswith("KeeWeb")) and (.name | endswith("linux.x64.deb")) )
-               | .browser_download_url' )
-        curl -LO "$URL"
-        sudo dpkg -i KeeWeb*.deb
-        sudo apt-get -f install
-        rm -r /tmp/keeweb-download
