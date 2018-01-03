@@ -84,22 +84,22 @@ setup:
       - telegram-sergiusens
       - discord
       # Development:
-      - vscode:
-          classic: true
-      - pycharm-professional:
-          classic: true
-      - snapcraft:
-          classic: true
+      - package: vscode
+        classic: true
+      - package: pycharm-professional
+        classic: true
+      - package: snapcraft
+        classic: true
       - datagrip
       - lxd
-      - multipass:
-          classic: true
-          channel: beta
+      - package: multipass
+        classic: true
+        channel: beta
       # Utilities:
       - nextcloud-client
-      - ubports-installer:
-          channel: edge
-          devmode: true
+      - package: ubports-installer
+        channel: edge
+        devmode: true
       - hugo
     $apt-packages:
       - gnome-tweak-tool
