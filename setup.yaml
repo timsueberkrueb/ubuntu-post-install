@@ -21,11 +21,12 @@ setup:
       fc-cache -vf ~/.fonts/
       rm -r /tmp/powerline-downloads
   chips:
+    $github-releases:
+      - repo: xtendo-org/chips
+        release: latest
+        asset: chips_gnulinux
+        target: ~/.local/bin/chips
     $scriptlet: |
-      URL=$( curl -s "https://api.github.com/repos/xtendo-org/chips/releases/latest" \
-       | jq -r '.assets[] | select(.name=="chips_gnulinux" )
-       | .browser_download_url' )
-      curl -Lo ~/.local/bin/chips --create-dirs "$URL";
       chmod +x ~/.local/bin/chips
   shellder:
     $scriptlet: |
@@ -56,32 +57,33 @@ setup:
       - ~/Dev
   desktop-apps:
     etcher:
+      $folders: [~/Apps/Etcher]
+      $github-releases:
+        - repo: resin-io/etcher
+          release: latest
+          asset: etcher-[0-9.]+.x86_64.AppImage
+          target: ~/Apps/Etcher/Etcher.AppImage
       $scriptlet: |
-        mkdir -p ~/Apps/Etcher && cd ~/Apps/Etcher
-        URL=$( curl -s "https://api.github.com/repos/resin-io/etcher/releases/latest" \
-               | jq -r '.assets[] | select((.name | startswith("etcher")) and (.name | endswith("x86_64.AppImage")) )
-               | .browser_download_url' )
-        curl -LO "$URL"
-        chmod +x *.AppImage
+        chmod +x  ~/Apps/Etcher/Etcher.AppImage
     insomnia:
       $scriptlet: |
         mkdir -p ~/Apps/Insomnia && cd ~/Apps/Insomnia
-        curl -LO "https://builds.insomnia.rest/downloads/linux/latest"
-        chmod +x *.AppImage
+        curl -L "https://builds.insomnia.rest/downloads/linux/latest" -o Insomnia.AppImage
+        chmod +x Insomnia.AppImage
     keeweb:
+      $github-releases:
+        - repo: keeweb/keeweb
+          release: latest
+          asset: KeeWeb-[0-9.]+.linux.x64.deb
+          target: /tmp/KeeWeb.deb
       $scriptlet: |
-        mkdir -p /tmp/keeweb-download && cd /tmp/keeweb-download
-        URL=$( curl -s "https://api.github.com/repos/keeweb/keeweb/releases/latest" \
-               | jq -r '.assets[] | select((.name | startswith("KeeWeb")) and (.name | endswith("linux.x64.deb")) )
-               | .browser_download_url' )
-        curl -LO "$URL"
-        sudo dpkg -i KeeWeb*.deb
+        sudo dpkg -i /tmp/KeeWeb.deb
         sudo apt-get -f install
-        rm -r /tmp/keeweb-download
+        rm -r /tmp/KeeWeb.deb
     $snap-packages:
       # Network & Communication:
       - chromium
-      - telegram-sergiusens
+      - telegram-desktop
       - discord
       # Development:
       - package: vscode
