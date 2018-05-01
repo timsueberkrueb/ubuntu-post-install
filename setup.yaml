@@ -1,11 +1,10 @@
 author: Tim Süberkrüb
 description: |
   My personal Ubuntu setup powered by ubup.
-  Tested on Ubuntu 17.10
+  Tested on Ubuntu 18.04
 setup:
   cmd-tools:
     $apt-packages:
-      - jq
       - curl
       - fish
   powerline-fonts:
@@ -21,6 +20,8 @@ setup:
       fc-cache -vf ~/.fonts/
       rm -r /tmp/powerline-downloads
   chips:
+    $folders:
+      - ~/.local/bin
     $github-releases:
       - repo: xtendo-org/chips
         release: latest
@@ -53,21 +54,41 @@ setup:
       - python-dev
   home-folders:
     $folders:
-      - ~/Apps
+      - ~/Applications
       - ~/Dev
+  appimaged:
+    $scriptlet: |
+      mkdir -p /tmp/appimaged-download && cd /tmp/appimaged-download
+      wget "https://github.com/AppImage/AppImageKit/releases/download/continuous/appimaged-x86_64.AppImage"
+      chmod a+x appimaged-x86_64.AppImage
+      ./appimaged-x86_64.AppImage --install
+      rm -r /tmp/appimaged-download
+  appimageupdate:
+    $github-releases:
+      - repo: AppImage/AppImageUpdate
+        release: continuous
+        asset: AppImageUpdate-[0-9]+-[A-Fa-f0-9]+-x86_64.AppImage
+        target: ~/.local/bin/AppImageUpdate
+    $scriptlet: |
+      chmod +x ~/.local/bin/AppImageUpdate
+  theme:
+    $snap-packages:
+      - communitheme
+  window-buttons:
+    $scriptlet: |
+      gsettings set org.gnome.desktop.wm.preferences button-layout close,minimize,maximize:
   desktop-apps:
     etcher:
-      $folders: [~/Apps/Etcher]
       $github-releases:
         - repo: resin-io/etcher
           release: latest
-          asset: etcher-[0-9.]+.x86_64.AppImage
-          target: ~/Apps/Etcher/Etcher.AppImage
+          asset: etcher-electron-[0-9.]+-x86_64.AppImage
+          target: ~/Applications/Etcher.AppImage
       $scriptlet: |
-        chmod +x  ~/Apps/Etcher/Etcher.AppImage
+        chmod +x  ~/Applications/Etcher.AppImage
     insomnia:
       $scriptlet: |
-        mkdir -p ~/Apps/Insomnia && cd ~/Apps/Insomnia
+        cd ~/Applications
         curl -L "https://builds.insomnia.rest/downloads/linux/latest" -o Insomnia.AppImage
         chmod +x Insomnia.AppImage
     keeweb:
@@ -82,9 +103,12 @@ setup:
         rm -r /tmp/KeeWeb.deb
     $snap-packages:
       # Network & Communication:
+      - firefox
       - chromium
       - telegram-desktop
       - discord
+      # Office
+      - libreoffice
       # Development:
       - package: vscode
         classic: true
@@ -92,16 +116,13 @@ setup:
         classic: true
       - package: snapcraft
         classic: true
-      - datagrip
       - lxd
+      - docker
       - package: multipass
         classic: true
         channel: beta
       # Utilities:
       - nextcloud-client
-      - package: ubports-installer
-        channel: edge
-        devmode: true
-      - hugo
+      - ubports-installer
     $apt-packages:
       - gnome-tweak-tool
