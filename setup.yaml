@@ -29,12 +29,12 @@ setup:
         target: ~/.local/bin/chips
     $scriptlet: |
       chmod +x ~/.local/bin/chips
-  shellder:
+  bobthefish:
     $scriptlet: |
       mkdir -p ~/.config/chips
       touch ~/.config/chips/plugin.yaml
       echo "github:" >> ~/.config/chips/plugin.yaml
-      echo "  - simnalamburt/shellder" >> ~/.config/chips/plugin.yaml
+      echo "  - oh-my-fish/theme-bobthefish" >> ~/.config/chips/plugin.yaml
       echo "" >> ~/.config/chips/plugin.yaml
       exec ~/.local/bin/chips
   chsh:
@@ -67,7 +67,7 @@ setup:
     $github-releases:
       - repo: AppImage/AppImageUpdate
         release: continuous
-        asset: AppImageUpdate-[0-9]+-[A-Fa-f0-9]+-x86_64.AppImage
+        asset: AppImageUpdate-x86_64.AppImage
         target: ~/.local/bin/AppImageUpdate
     $scriptlet: |
       chmod +x ~/.local/bin/AppImageUpdate
@@ -80,17 +80,12 @@ setup:
   desktop-apps:
     etcher:
       $github-releases:
-        - repo: resin-io/etcher
+        - repo: balena-io/etcher
           release: latest
-          asset: etcher-electron-[0-9.]+-x86_64.AppImage
+          asset: balenaEtcher-[0-9.]+-x64.AppImage
           target: ~/Applications/Etcher.AppImage
       $scriptlet: |
         chmod +x  ~/Applications/Etcher.AppImage
-    insomnia:
-      $scriptlet: |
-        cd ~/Applications
-        curl -L "https://builds.insomnia.rest/downloads/linux/latest" -o Insomnia.AppImage
-        chmod +x Insomnia.AppImage
     keeweb:
       $github-releases:
         - repo: keeweb/keeweb
@@ -101,28 +96,36 @@ setup:
         sudo dpkg -i /tmp/KeeWeb.deb
         sudo apt-get -f install
         rm -r /tmp/KeeWeb.deb
+    riot:
+      $scriptlet: |
+        sudo apt install -y lsb-release wget apt-transport-https
+        sudo wget -O /usr/share/keyrings/riot-im-archive-keyring.gpg https://packages.riot.im/debian/riot-im-archive-keyring.gpg
+        echo "deb [signed-by=/usr/share/keyrings/riot-im-archive-keyring.gpg] https://packages.riot.im/debian/ $(lsb_release -cs) main" |
+            sudo tee /etc/apt/sources.list.d/riot-im.list
+        sudo apt update -y
+        sudo apt install -y riot-web
+    nextcloud-client:
+      $ppas: [nextcloud-devs/client]
+      $apt-packages: [nextcloud-client]
     $snap-packages:
       # Network & Communication:
       - firefox
       - chromium
       - telegram-desktop
       - discord
-      # Office
-      - libreoffice
       # Development:
-      - package: vscode
+      - package: code
         classic: true
-      - package: pycharm-professional
+      - package: atom
         classic: true
+      - docker
       - package: snapcraft
         classic: true
-      - lxd
-      - docker
       - package: multipass
         classic: true
         channel: beta
+      - insomnia
       # Utilities:
-      - nextcloud-client
       - ubports-installer
     $apt-packages:
       - gnome-tweak-tool
