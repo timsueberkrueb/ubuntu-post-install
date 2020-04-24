@@ -1,7 +1,7 @@
 author: Tim Süberkrüb
 description: |
   My personal Ubuntu setup powered by ubup.
-  Tested on Ubuntu 18.04
+  Tested on Ubuntu 20.04
 setup:
   cmd-tools:
     $apt-packages:
@@ -29,12 +29,12 @@ setup:
         target: ~/.local/bin/chips
     $scriptlet: |
       chmod +x ~/.local/bin/chips
-  bobthefish:
+  shellder:
     $scriptlet: |
       mkdir -p ~/.config/chips
       touch ~/.config/chips/plugin.yaml
       echo "github:" >> ~/.config/chips/plugin.yaml
-      echo "  - oh-my-fish/theme-bobthefish" >> ~/.config/chips/plugin.yaml
+      echo "  - simnalamburt/shellder" >> ~/.config/chips/plugin.yaml
       echo "" >> ~/.config/chips/plugin.yaml
       exec ~/.local/bin/chips
   chsh:
@@ -51,7 +51,6 @@ setup:
       - mesa-common-dev
       - autoconf
       - python3-dev
-      - python-dev
   home-folders:
     $folders:
       - ~/Applications
@@ -59,7 +58,7 @@ setup:
   appimaged:
     $scriptlet: |
       mkdir -p /tmp/appimaged-download && cd /tmp/appimaged-download
-      wget "https://github.com/AppImage/AppImageKit/releases/download/continuous/appimaged-x86_64.AppImage"
+      wget "https://github.com/AppImage/appimaged/releases/download/continuous/appimaged-x86_64.AppImage"
       chmod a+x appimaged-x86_64.AppImage
       ./appimaged-x86_64.AppImage --install
       rm -r /tmp/appimaged-download
@@ -71,12 +70,6 @@ setup:
         target: ~/.local/bin/AppImageUpdate
     $scriptlet: |
       chmod +x ~/.local/bin/AppImageUpdate
-  theme:
-    $snap-packages:
-      - communitheme
-  window-buttons:
-    $scriptlet: |
-      gsettings set org.gnome.desktop.wm.preferences button-layout close,minimize,maximize:
   desktop-apps:
     etcher:
       $github-releases:
@@ -96,23 +89,17 @@ setup:
         sudo dpkg -i /tmp/KeeWeb.deb
         sudo apt-get -f install
         rm -r /tmp/KeeWeb.deb
-    riot:
-      $scriptlet: |
-        sudo apt install -y lsb-release wget apt-transport-https
-        sudo wget -O /usr/share/keyrings/riot-im-archive-keyring.gpg https://packages.riot.im/debian/riot-im-archive-keyring.gpg
-        echo "deb [signed-by=/usr/share/keyrings/riot-im-archive-keyring.gpg] https://packages.riot.im/debian/ $(lsb_release -cs) main" |
-            sudo tee /etc/apt/sources.list.d/riot-im.list
-        sudo apt update -y
-        sudo apt install -y riot-web
-    nextcloud-client:
-      $ppas: [nextcloud-devs/client]
-      $apt-packages: [nextcloud-client]
+    # TODO: PPA wasn't updated for 20.04, yet.
+    #nextcloud-client:
+    #  $ppas: [nextcloud-devs/client]
+    #  $apt-packages: [nextcloud-client]
     $snap-packages:
       # Network & Communication:
       - firefox
       - chromium
       - telegram-desktop
       - discord
+      - riot-web
       # Development:
       - package: code
         classic: true
@@ -123,7 +110,6 @@ setup:
         classic: true
       - package: multipass
         classic: true
-        channel: beta
       - insomnia
       # Utilities:
       - ubports-installer
